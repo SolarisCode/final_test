@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../../includes/minishell.h"
 
 void ft_pushfront_string_env(t_env **head_ref, char *data)
 {

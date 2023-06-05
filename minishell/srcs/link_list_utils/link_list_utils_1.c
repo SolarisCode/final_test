@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../../includes/minishell.h"
 
 void ft_swap(t_env *a, t_env *b)
 {
@@ -18,7 +18,7 @@ void ft_sort_linked_list(t_env **head_ref)
 		return;
 	int swapped;
 	t_env *current;
-	t_env *next = NULL;
+	// t_env *next = NULL;
 	while (1)
 	{
 
@@ -33,7 +33,7 @@ void ft_sort_linked_list(t_env **head_ref)
 			}
 			current = current->next;
 		}
-		next = current;
+		// next = current;
 		if (!swapped)
 			break;
 	}

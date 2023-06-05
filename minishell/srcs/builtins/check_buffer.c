@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../../includes/minishell.h"
 
 void ft_check_buffer(t_mVars *list_pointer)
 {

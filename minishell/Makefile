@@ -6,7 +6,7 @@
 #    By: estruckm <estruckm@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/12 00:02:38 by melkholy          #+#    #+#              #
-#    Updated: 2023/05/18 18:04:48 by estruckm         ###   ########.fr        #
+#    Updated: 2023/05/22 02:30:57 by melkholy         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,35 +19,36 @@ COLOR_BLUE	= \033[94m
 RESET	= \033[0m
 
 SOURCES = srcs/main.c \
-    srcs/parsing/parsing_utils.c \
-    srcs/parsing/parsing_redirection.c \
-    srcs/lexing/lexer.c \
-    srcs/parsing/parser.c \
-    srcs/parsing/input_analysis.c \
-    srcs/signals/signals.c \
-    srcs/execution/execution.c \
-    srcs/link_list_utils/link_list_utils_1.c \
-    srcs/link_list_utils/link_list_utils_2.c \
-    srcs/link_list_utils/link_list_utils_3.c \
-    srcs/builtins/echo.c \
-    srcs/builtins/execute_buildins.c \
-    srcs/builtins/env.c \
-    srcs/builtins/pwd.c \
-    srcs/builtins/cd.c \
-    srcs/builtins/exit.c \
-    srcs/builtins/unset.c \
-    srcs/builtins/export.c \
-    srcs/builtins/check_buffer.c \
-    srcs/builtin_utils/builtins_utils.c \
-    srcs/builtin_utils/export_utils_1.c \
-    srcs/builtin_utils/cd_utils_1.c \
-    srcs/builtin_utils/cd_utils_2.c \
+			srcs/parsing/parsing_utils.c \
+			srcs/parsing/parsing_redirection.c \
+			srcs/lexing/lexer.c \
+			srcs/parsing/parser.c \
+			srcs/parsing/input_analysis.c \
+			srcs/signals/signals.c \
+			srcs/execution/execution.c \
+			srcs/link_list_utils/link_list_utils_1.c \
+			srcs/link_list_utils/link_list_utils_2.c \
+			srcs/link_list_utils/link_list_utils_3.c \
+			srcs/builtins/echo.c \
+			srcs/builtins/execute_buildins.c \
+			srcs/builtins/env.c \
+			srcs/builtins/pwd.c \
+			srcs/builtins/cd.c \
+			srcs/builtins/exit.c \
+			srcs/builtins/unset.c \
+			srcs/builtins/export.c \
+			srcs/builtins/check_buffer.c \
+			srcs/builtin_utils/builtins_utils.c \
+			srcs/builtin_utils/export_utils_1.c \
+			srcs/builtin_utils/cd_utils_1.c \
+			srcs/builtin_utils/cd_utils_2.c \
 
 OBJS = $(SOURCES:.c=.o)
 NAME = minishell
 LIBFT = ./Libft/libft.a
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -g -I $(HOME)/goinfre/.brew/opt/readline/include/ -Iincludes
+LFLAGS = -Wall -Wextra -Werror -g
 
 all: $(NAME)
 
@@ -61,6 +62,12 @@ $(NAME): $(LIBFT) $(OBJS)
 	@printf "$(COLOR_BLUE)Compiling $<...$(RESET_CLR)"; \
 	$(CC) $(CFLAGS) -c $< -o $@; \
 	printf "$(SUCCESS_CLR) Done.$(RESET_CLR)\n"
+
+linux: $(LIBFT) $(SOURCES)
+	@printf "$(COLOR_BLUE)Compiling $<...$(RESET_CLR)"; \
+	$(CC) $(LFLAGS) $(SOURCES) -L./Libft -Iincludes -lft -L-L/usr/lib/x86_64-linux-gnu/ -lreadline -o $(NAME) && \
+	printf "$(SUCCESS_CLR) Done.$(RESET_CLR)\n" || \
+	printf "$(COLOR_RED) Failed.$(RESET_CLR)\n"
 
 $(LIBFT):
 	make -C Libft

@@ -6,7 +6,7 @@
 /*   By: estruckm <estruckm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 23:06:58 by melkholy          #+#    #+#             */
-/*   Updated: 2023/05/19 01:40:53 by melkholy         ###   ########.fr       */
+/*   Updated: 2023/05/24 00:11:10 by melkholy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,24 +27,6 @@ int	ft_cmd_size(t_cmds *cmd)
 	return (count);
 }
 
-// void	ft_execute_buildin(t_cmds *cmd, t_env **env_list)
-// {
-// 	if (!cmd->cmd)
-// 		return ;
-// 	if (!ft_strcmp(cmd->cmd, "export"))
-// 		ft_export(cmd->args, env_list);
-// 	else if (!ft_strcmp(cmd->cmd, "env"))
-// 		ft_env(*env_list);
-// 	else if (!ft_strcmp(cmd->cmd, "cd"))
-// 		ft_cd(cmd->args, *env_list);
-// 	else if (!ft_strcmp(cmd->cmd, "pwd"))
-// 		ft_pwd();
-// 	else if (!ft_strcmp(cmd->cmd, "unset"))
-// 		ft_unset(cmd->args, env_list);
-// 	else if (!ft_strcmp(cmd->cmd, "echo"))
-// 		ft_echo(cmd->args);
-// }
-
 char	**ft_create_env_array(t_env	*env_list)
 {
 	t_env	*tmp_list;
@@ -60,14 +42,15 @@ char	**ft_create_env_array(t_env	*env_list)
 		str = NULL;
 		str = ft_join_free_both(ft_strdup(tmp_list->var), ft_strdup("="));
 		str = ft_join_free_both(str, ft_strdup(tmp_list->value));
-		env_array[++index] = str;
+		env_array[++index] = ft_strdup(str);
 		env_array = ft_double_realloc(env_array, index + 1, index + 2);
 		tmp_list = tmp_list->next;
+		free(str);
 	}
 	return (env_array);
 }
 
-int	ft_infile_fd(t_cmds *cmd, char *file)
+int	ft_infile_fd(char *file)
 {
 	int	infile;
 
@@ -76,7 +59,6 @@ int	ft_infile_fd(t_cmds *cmd, char *file)
 		return (-1);
 	if (access(file, F_OK | R_OK))
 	{
-		cmd->file_error = 1;
 		printf("minihell: %s : %s\n", strerror(errno), file);
 		return (-1);
 	}
@@ -98,10 +80,7 @@ void	ft_outfile_fd(char *to_file, int redirect)
 	if (!access(to_file, F_OK | W_OK))
 		outfile = open(to_file, O_WRONLY | flag);
 	else if (!access(to_file, F_OK))
-	{
 		printf("minihell: %s: %s\n", strerror(errno), to_file);
-		g_term_attr.status = 1;
-	}
 	else
 		outfile = open(to_file, O_RDWR | O_CREAT | flag, 0666);
 	dup2(outfile, STDOUT_FILENO);
@@ -170,17 +149,19 @@ int	ft_here_doc(char **hdocs_end, t_env *env_list)
 
 int	ft_execute_in_redirect(t_cmds *cmd, t_env *env_list)
 {
+	int	infile_count;
 	int	count;
 	int	fd;
 
 	count = -1;
 	fd = -1;
+	infile_count = -1;
 	while (cmd->priority && cmd->priority[++count])
 	{
 		if (fd > 0)
 			close(fd);
 		if (cmd->priority[count] == '1')
-			fd = ft_infile_fd(cmd, *cmd->from_file++);
+			fd = ft_infile_fd(cmd->from_file[++infile_count]);
 		else if (cmd->priority[count] == '2')
 			fd = ft_here_doc(cmd->hdocs_end++, env_list);
 	}
@@ -207,17 +188,62 @@ int	ft_execute_out_redirect(t_cmds *cmd)
 	return (0);
 }
 
+void	ft_file_errors(t_cmds *cmd)
+{
+	int	count;
+
+	count = -1;
+	if (cmd->redirect == INPUT)
+		while (cmd->from_file[++count])
+			if (access(cmd->from_file[count], F_OK | R_OK))
+				cmd->file_error = 1;
+	count = -1;
+	if ((cmd->redirect & OUTPUT) == OUTPUT
+		|| (cmd->redirect & APPEND) == APPEND)
+		while (cmd->to_file[++count])
+		{
+			if (!access(cmd->to_file[count], F_OK | W_OK))
+				continue ;
+			else if (!access(cmd->to_file[count], F_OK))
+				cmd->file_error = 1;
+		}
+}
+
+void	ft_error_handler(t_cmds *cmd)
+{
+	char	*error_str;
+
+	error_str = NULL;
+	ft_file_errors(cmd);
+	if (cmd->file_error)
+		g_term_attr.status = 1;
+	if (cmd->cmd_error == 126)
+	{
+		error_str = ft_strjoin("minihell: Permission denied : ", cmd->cmd);
+		g_term_attr.status = 126;
+	}
+	else if (cmd->cmd_error == 127)
+	{
+		error_str = ft_strjoin("minihell: Command not found : ", cmd->cmd);
+		g_term_attr.status = 127;
+	}
+	if (error_str)
+	{
+		write(2, error_str, ft_strlen(error_str));
+		write(2, "\n", 1);
+		free(error_str);
+		error_str = NULL;
+	}
+}
+
 void	ft_execute_cmd(t_cmds *cmd, char **env_array, t_env *env_list)
 {
 	ft_execute_in_redirect(cmd, env_list);
 	ft_execute_out_redirect(cmd);
-	if (!cmd->full_cmd || cmd->file_error)
+	if (!cmd->full_cmd || cmd->file_error || cmd->cmd_error)
 		exit(1);
 	if (execve(cmd->full_cmd[0], cmd->full_cmd, env_array))
-	{
-		printf("minihell: %s:%s\n", strerror(errno), cmd->cmd);
 		exit(1);
-	}
 }
 
 int	ft_strcmp(char *s1, char *s2)
@@ -230,7 +256,7 @@ int	ft_strcmp(char *s1, char *s2)
 	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }
 
-int	ft_is_builtin(char* cmd)
+int	ft_is_builtin(char *cmd)
 {
 	if (!cmd)
 		return (0);
@@ -278,18 +304,6 @@ int	*ft_create_pid(int proc)
 	return (pid);
 }
 
-// void	ft_test_cmd(t_cmds *cmd, char **env_array, t_env *env_list)
-// {
-// 	ft_execute_redirection(cmd, env_list);
-// 	if (!cmd->full_cmd)
-// 		exit(1);
-// 	if (execve(cmd->full_cmd[0], cmd->full_cmd, env_array))
-// 	{
-// 		printf("minihell: %s:%s\n", strerror(errno), cmd->cmd);
-// 		exit(1);
-// 	}
-// }
-
 void	ft_close_out_pipes(t_mVars *vars_list, int fd)
 {
 	int	count;
@@ -308,7 +322,7 @@ void	ft_close_out_pipes(t_mVars *vars_list, int fd)
 		{
 			dup2(vars_list->pipefd[count][1], STDOUT_FILENO);
 			close(vars_list->pipefd[count][1]);
-			continue;
+			continue ;
 		}
 		close(vars_list->pipefd[count][1]);
 	}
@@ -332,7 +346,7 @@ void	ft_close_in_pipes(t_mVars *vars_list, int fd)
 		{
 			dup2(vars_list->pipefd[count][0], STDIN_FILENO);
 			close(vars_list->pipefd[count][0]);
-			continue;
+			continue ;
 		}
 		close(vars_list->pipefd[count][0]);
 	}
@@ -350,33 +364,6 @@ void	ft_close_all_pipes(t_mVars *vars_list)
 	}
 }
 
-void	ft_error_handler(t_cmds *cmd)
-{
-	char	*error_str;
-
-	error_str = NULL;
-	if (cmd->file_error)
-		g_term_attr.status = 1;
-	if (cmd->cmd_error == 126)
-	{
-		error_str = ft_strjoin("minihell: Permission denied : ", cmd->cmd);
-		g_term_attr.status = 126;
-	}
-	else if (cmd->cmd_error == 127)
-	{
-		error_str = ft_strjoin("minihell: Command not found : ", cmd->cmd);
-		g_term_attr.status = 127;
-	}
-	if (error_str)
-	{
-		// write(2, &error_str, ft_strlen(error_str));
-		printf("%s\n", error_str);
-		// perror(error_str);
-		write(2, "\n", 1);
-		free(error_str);
-	}
-}
-
 void	ft_child_cmd(t_mVars *vars_list, t_cmds *cmd, int index)
 {
 	if (ft_execute_in_redirect(cmd, vars_list->ls_buffer) || !index)
@@ -387,18 +374,70 @@ void	ft_child_cmd(t_mVars *vars_list, t_cmds *cmd, int index)
 		ft_close_out_pipes(vars_list, -1);
 	else
 		ft_close_out_pipes(vars_list, index);
-	ft_error_handler(cmd);
-	if (!cmd->full_cmd || cmd->file_error)
+	if (!cmd->full_cmd || cmd->file_error || cmd->cmd_error)
 	{
 		ft_close_all_pipes(vars_list);
 		exit(1);
 	}
-	execve(cmd->full_cmd[0], cmd->full_cmd, vars_list->env_array);
+	if (ft_is_builtin(cmd->cmd))
+		ft_execute_buildins(cmd, vars_list);
+	else
+		execve(cmd->full_cmd[0], cmd->full_cmd, vars_list->env_array);
+	exit(0);
+}
+
+void	ft_child_heredoc(t_cmds *cmds, t_mVars *vars_list)
+{
+	t_cmds	*tmp;
+	int		count;
+
+	count = 0;
+	tmp = cmds;
+	while (tmp)
+	{
+		if ((tmp->redirect & HEREDOC) == HEREDOC)
+		{
+			vars_list->pids[count] = fork();
+			if (vars_list->pids[count] < 0)
+				return ((void)printf("minihell: fork() failed\n"));
+			if (vars_list->pids[count] == 0)
+				ft_child_cmd(vars_list, tmp, count);
+			waitpid(vars_list->pids[count], NULL, 0);
+		}
+		count ++;
+		tmp = tmp->next;
+	}
+}
+
+void	ft_cmds_processing(t_cmds *cmds, t_mVars *vars_list)
+{
+	t_cmds	*tmp;
+	int		count;
+
+	count = 0;
+	tmp = cmds;
+	ft_child_heredoc(cmds, vars_list);
+	while (tmp)
+	{
+		ft_error_handler(tmp);
+		if ((tmp->redirect & HEREDOC) == HEREDOC)
+		{
+			count ++;
+			tmp = tmp->next;
+			continue ;
+		}
+		vars_list->pids[count] = fork();
+		if (vars_list->pids[count] < 0)
+			return ((void)printf("minihell: fork() failed\n"));
+		else if (vars_list->pids[count] == 0)
+			ft_child_cmd(vars_list, tmp, count);
+		count ++;
+		tmp = tmp->next;
+	}
 }
 
 void	ft_many_cmd_exe(t_cmds *cmds, t_mVars *vars_list)
 {
-	t_cmds	*tmp;
 	int		cmd_count;
 	int		count;
 
@@ -406,24 +445,42 @@ void	ft_many_cmd_exe(t_cmds *cmds, t_mVars *vars_list)
 	vars_list->pipefd = ft_create_pipes(cmd_count - 1);
 	vars_list->pids = ft_create_pid(cmd_count);
 	vars_list->pipe_count = cmd_count - 1;
-	tmp = cmds;
-	count = 0;
-	while (tmp)
-	{
-		vars_list->pids[count] = fork();
-		if (vars_list->pids[count] < 0)
-			printf("minihell: fork() failed\n");
-		if (vars_list->pids[count] == 0)
-			ft_child_cmd(vars_list, tmp, count);
-		if ((tmp->redirect & HEREDOC))
-			unlink("minhell_tmp.txt");
-		count ++;
-		tmp = tmp->next;
-	}
+	ft_cmds_processing(cmds, vars_list);
 	count = -1;
 	ft_close_all_pipes(vars_list);
 	while (++count < cmd_count)
 		waitpid(vars_list->pids[count], NULL, 0);
+}
+
+void	ft_exit_status(t_cmds *cmd)
+{
+	t_cmds	*last_cmd;
+
+	last_cmd = cmd;
+	while (last_cmd->next)
+		last_cmd = last_cmd->next;
+	if (last_cmd->cmd_error)
+		g_term_attr.status = last_cmd->cmd_error;
+	else if (last_cmd->file_error)
+	{
+		g_term_attr.status = last_cmd->file_error;
+	}
+	else
+		g_term_attr.status = 0;
+}
+
+void	ft_free_pipes(t_mVars *vars_list)
+{
+	int	count;
+
+	count = 0;
+	while (count < vars_list->pipe_count)
+	{
+		free(vars_list->pipefd[count]);
+		count ++;
+	}
+	free(vars_list->pipefd);
+	vars_list->pipefd = NULL;
 }
 
 void	ft_cmd_analysis(t_cmds *cmd, t_mVars *vars_list)
@@ -432,20 +489,25 @@ void	ft_cmd_analysis(t_cmds *cmd, t_mVars *vars_list)
 
 	vars_list->env_array = ft_create_env_array(vars_list->ls_buffer);
 	if (cmd->next)
+	{
 		ft_many_cmd_exe(cmd, vars_list);
+		ft_free_pipes(vars_list);
+		free(vars_list->pids);
+		vars_list->pids = 0;
+	}
 	else if (!ft_is_builtin(cmd->cmd))
 	{
+		ft_error_handler(cmd);
 		pid = fork();
 		if (pid == 0)
 			ft_execute_cmd(cmd, vars_list->env_array, vars_list->ls_buffer);
-		wait(NULL);
-		if ((cmd->redirect & HEREDOC))
-			unlink("minhell_tmp.txt");
-		ft_free_cmdlist(&cmd);
+		waitpid(pid, NULL, 0);
 	}
 	else
-	{
 		ft_execute_buildins(cmd, vars_list);
-		ft_free_cmdlist(&cmd);
-	}
+	if (!access("minhell_tmp.txt", F_OK))
+		unlink("minhell_tmp.txt");
+	ft_free_dstr(vars_list->env_array);
+	ft_exit_status(cmd);
+	ft_free_cmdlist(&cmd);
 }

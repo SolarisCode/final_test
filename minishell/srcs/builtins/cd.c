@@ -6,11 +6,11 @@
 /*   By: estruckm <estruckm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 15:41:21 by estruckm          #+#    #+#             */
-/*   Updated: 2023/05/18 14:39:39 by estruckm         ###   ########.fr       */
+/*   Updated: 2023/05/19 16:38:15 by melkholy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../../includes/minishell.h"
 
 void ft_check_oldpath(t_mVars *list_pointer)
 {

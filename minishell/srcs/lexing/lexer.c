@@ -6,11 +6,11 @@
 /*   By: melkholy <melkholy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/01 15:41:54 by melkholy          #+#    #+#             */
-/*   Updated: 2023/05/10 23:20:13 by melkholy         ###   ########.fr       */
+/*   Updated: 2023/05/22 00:46:27 by melkholy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../../includes/minishell.h"
 
 char	*ft_expansion(char *str, t_env *env_list)
 {
@@ -20,7 +20,10 @@ char	*ft_expansion(char *str, t_env *env_list)
 	if (!str)
 		return (ft_strdup("$"));
 	if (!ft_strcmp(str, "?"))
+	{
+		free(str);
 		return (ft_itoa(g_term_attr.status));
+	}
 	while (tmp)
 	{
 		if (!ft_strcmp(str, tmp->var))

@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../../includes/minishell.h"
 
 void ft_cd_minus(t_mVars *list_pointer)
 {

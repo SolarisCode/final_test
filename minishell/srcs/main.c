@@ -6,7 +6,7 @@
 /*   By: estruckm <estruckm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 23:06:18 by melkholy          #+#    #+#             */
-/*   Updated: 2023/05/18 21:47:43 by melkholy         ###   ########.fr       */
+/*   Updated: 2023/05/22 02:40:18 by melkholy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,8 @@ void	ft_exit_minihell(char *str, t_cmds *cmd, t_mVars *list_pointers)
 	if (!str)
 	{
 		rl_on_new_line();
-		rl_redisplay();
+		// check this on Mac first before remove it compeletly ;
+		// rl_redisplay();
 	}
 	if (str)
 		free(str);
@@ -74,7 +75,6 @@ void	ft_exit_minihell(char *str, t_cmds *cmd, t_mVars *list_pointers)
 	ft_free_envlist(&list_pointers->ls_env);
 	ft_free_envlist(&list_pointers->ls_export);
 	ft_free_envlist(&list_pointers->ls_buffer);
-	ft_free_dstr(list_pointers->env_array);
 	free(list_pointers->home);
 	free(list_pointers);
 	write(1, "exit\n", 5);

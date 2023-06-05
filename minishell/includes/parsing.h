@@ -1,5 +1,19 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parsing.h                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: melkholy <melkholy@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/05/22 02:05:03 by melkholy          #+#    #+#             */
+/*   Updated: 2023/05/22 02:05:17 by melkholy         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PARSING_H
 # define PARSING_H
+
+# include "minishell.h"
 
 /* parsing_redirection.c */
 char	*ft_add_io_file(char *old_file, char *new_file, int len);

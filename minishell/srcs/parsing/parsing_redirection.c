@@ -6,11 +6,11 @@
 /*   By: estruckm <estruckm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/01 15:48:07 by melkholy          #+#    #+#             */
-/*   Updated: 2023/05/18 14:40:55 by estruckm         ###   ########.fr       */
+/*   Updated: 2023/05/22 01:47:30 by melkholy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../../includes/minishell.h"
 
 char	*ft_add_io_file(char *old_file, char *new_file, int len)
 {
@@ -27,11 +27,10 @@ char	**ft_many_redirect(char **old_files, char *new_file, int len)
 	size = 0;
 	if (!old_files)
 	{
-		files = (char **)ft_calloc(1, sizeof(char *));
+		files = (char **)ft_calloc(2, sizeof(char *));
 		if (!files)
 			return (NULL);
 		files[0] = ft_substr(new_file, len, ft_strlen(new_file));
-		files = ft_double_realloc(files, 1, 2);
 		return (files);
 	}
 	while (old_files[size])
@@ -47,6 +46,8 @@ void	ft_arrange_table(char **table, int index, int len)
 	{
 		free(table[index]);
 		free(table[index + 1]);
+		table[index] = NULL;
+		table[index + 1] = NULL;
 		while (table[index + 2])
 		{
 			table[index] = table[index + 2];
@@ -67,9 +68,9 @@ int	ft_add_redirection(char **table, t_cmds *cmd, int index, int len)
 	int	redirect;
 
 	count = 0;
-	redirect =ft_get_redirection(table[index]);
-	while (table[index][count] && (table[index][count] == '<' ||
-			table[index][count] == '>'))
+	redirect = ft_get_redirection(table[index]);
+	while (table[index][count] && (table[index][count] == '<'
+		|| table[index][count] == '>'))
 		count ++;
 	if (count != len)
 		return (printf("%s `%c'\n", DIRECTION_ERR, table[index][0]), 1);
@@ -80,9 +81,8 @@ int	ft_add_redirection(char **table, t_cmds *cmd, int index, int len)
 	}
 	if (!table[index])
 		return (printf("%s `newline'\n", DIRECTION_ERR), 1);
-	if ((redirect & INPUT) == INPUT)
+	if (redirect == INPUT)
 		cmd->from_file = ft_many_redirect(cmd->from_file, table[index], len);
-		// cmd->from_file = ft_add_io_file(cmd->from_file, table[index], len);
 	else if ((redirect & HEREDOC) == HEREDOC)
 		cmd->hdocs_end = ft_many_redirect(cmd->hdocs_end, table[index], len);
 	else if ((redirect & OUTPUT) == OUTPUT || (redirect & APPEND) == APPEND)

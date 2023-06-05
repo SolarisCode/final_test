@@ -6,7 +6,7 @@
 /*   By: estruckm <estruckm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 00:02:20 by melkholy          #+#    #+#             */
-/*   Updated: 2023/05/19 01:33:29 by melkholy         ###   ########.fr       */
+/*   Updated: 2023/05/23 22:20:44 by melkholy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,8 @@ char	*ft_validate_cmd(t_cmds *cmd, char **env_path)
 		free(cmd_path);
 		cmd_path = NULL;
 	}
+	if (!cmd_path)
+		cmd->cmd_error = 127;
 	return (cmd_path);
 }
 
@@ -101,26 +103,19 @@ int	ft_add_path(t_cmds *cmd, t_env *env_list)
 
 	cmd_path = NULL;
 	count = -1;
+	if (!access(cmd->cmd, F_OK))
+	{
+		if (access(cmd->cmd, X_OK))
+			cmd->cmd_error = 126;
+		return (0);
+	}
 	env_path = ft_split(ft_find_envpath(env_list), ':');
 	while (env_path[++count])
 		env_path[count] = ft_strjoin_free(env_path[count], "/");
-	// count = -1;
-	// while (env_path[++count])
-	// {
-	// 	cmd_path = ft_strjoin(env_path[count], cmd->cmd);
-	// 	if (!access(cmd_path, F_OK | X_OK))
-	// 		break ;
-	// 	free(cmd_path);
-	// 	cmd_path = NULL;
-	// }
 	cmd_path = ft_validate_cmd(cmd, env_path);
 	ft_free_dstr(env_path);
 	if (!cmd_path)
-	{
-		if (cmd->cmd_error != 126)
-			cmd->cmd_error = 127;
 		return (1);
-	}
 	free(cmd->cmd);
 	cmd->cmd = cmd_path;
 	return (0);
@@ -225,7 +220,7 @@ void	ft_check_assigning(t_cmds *cmd, t_mVars *vars_list)
 				update_or_create(vars_list->ls_buffer, cmd->args[count]);
 		}
 		else
-			break;
+			break ;
 	}
 	free(cmd->cmd);
 	cmd->cmd = NULL;
@@ -258,7 +253,7 @@ void	ft_parse_input(char *in_put, t_mVars *vars_list)
 	while (tmp)
 	{
 		if (tmp->cmd && (ft_check_validity(tmp->cmd) == 2
-			|| ft_check_validity(tmp->cmd) == 3))
+				|| ft_check_validity(tmp->cmd) == 3))
 			ft_check_assigning(tmp, vars_list);
 		if (tmp->cmd && !ft_is_builtin(tmp->cmd))
 			if (!ft_add_path(tmp, vars_list->ls_buffer))
@@ -293,5 +288,6 @@ void	ft_parse_input(char *in_put, t_mVars *vars_list)
 	// 			printf("To_file: %s\n", tmp->to_file[cnt]);
 	// 	tmp = tmp->next;
 	// }
+	// ft_cmd_analysis(cmd, vars_list);
 	// ft_execute_buildin(cmd, env_list); //placing this here causes no problems
 }

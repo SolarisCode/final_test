@@ -1,5 +1,19 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   input_analysis.h                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: melkholy <melkholy@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/05/22 02:04:33 by melkholy          #+#    #+#             */
+/*   Updated: 2023/05/22 02:04:35 by melkholy         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef INPUT_ANALYSIS_H
 # define INPUT_ANALYSIS_H
+
+# include "minishell.h"
 
 /* input_analysis.c */
 void	ft_create_fullcmd(t_cmds *cmd);

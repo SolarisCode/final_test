@@ -6,11 +6,11 @@
 /*   By: melkholy <melkholy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 00:04:13 by melkholy          #+#    #+#             */
-/*   Updated: 2023/05/12 00:04:16 by melkholy         ###   ########.fr       */
+/*   Updated: 2023/05/19 16:41:35 by melkholy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../../includes/minishell.h"
 
 /* Used to ignore the Control + C signal
  and istead just displayed a new prompt on a new line */

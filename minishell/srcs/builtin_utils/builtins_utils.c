@@ -1,5 +1,5 @@
 
-#include "minishell.h"
+#include "../../includes/minishell.h"
 
 // int	ft_own_strcmp(char *s1, char *s2)
 // {
@@ -42,20 +42,20 @@ t_env *ft_get_env_node(t_env *head_ref, char *search)
 // # -fsanitize=address
 // # -fprofile-instr-generate -fcoverage-mapping
 
-// SRCS =	main.c \
-// 		./builtins/builtins.c \
-// 		./builtins/builtins_utils.c \
-// 		./builtins/change_env.c \
-// 		./builtins/link_list.c \
-// 		./builtins/export_utils.c \
-// 							\
-// 		./parsing/lex_check_input.c \
-// 		./parsing/main_run_fcts.c \
-// 		./parsing/par_clean_up.c \
-// 		./parsing/par_helpers.c \
-// 		./parsing/par_init_utils.c \
-// 									\
-// 		test_eike.c
+/* SRCS =	main.c \
+ 		./builtins/builtins.c \
+ 		./builtins/builtins_utils.c \
+ 		./builtins/change_env.c \
+ 		./builtins/link_list.c \
+ 		./builtins/export_utils.c \
+ 							\
+ 		./parsing/lex_check_input.c \
+ 		./parsing/main_run_fcts.c \
+ 		./parsing/par_clean_up.c \
+ 		./parsing/par_helpers.c \
+ 		./parsing/par_init_utils.c \
+ 									\
+ 		test_eike.c
 
 // D_SRCS = ./srcs/
 // SRC = $(addprefix $(D_SRCS), $(SRCS))
@@ -111,4 +111,4 @@ t_env *ft_get_env_node(t_env *head_ref, char *search)
 // 	$(shell git push)
 
 // # Output success message
-// #	$(shell echo "Git auto add & push with message performed.")
+// #	$(shell echo "Git auto add & push with message performed.") */
