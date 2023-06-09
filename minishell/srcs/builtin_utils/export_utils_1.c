@@ -1,14 +1,25 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   export_utils_1.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: estruckm <estruckm@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/06/09 21:14:57 by estruckm          #+#    #+#             */
+/*   Updated: 2023/06/09 21:14:58 by estruckm         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/minishell.h"
 
-char *get_value(char *string)
+char	*get_value(char *string)
 {
-	char *value;
-	int i;
-	int j;
+	char	*value;
+	int		i;
+	int		j;
 
 	i = 0;
 	j = 0;
-
 	while (string[i])
 	{
 		if (string[i] == '=')
@@ -17,19 +28,19 @@ char *get_value(char *string)
 			{
 				j++;
 			}
-			break;
+			break ;
 		}
 		i++;
 	}
-	value = ft_substr(string, i + 1 , j);
+	value = ft_substr(string, i + 1, j);
 	return (value);
 }
 
-char *get_name(char *string)
+char	*get_name(char *string)
 {
-	int i;
-	int j;
-	char *name;
+	int		i;
+	int		j;
+	char	*name;
 
 	i = 0;
 	j = 0;
@@ -45,17 +56,17 @@ char *get_name(char *string)
 	return (name);
 }
 
-int ft_check_validity(char *s)
+int	ft_check_validity(char *s)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	if (s[0] == '=')
-		return 1;
+		return (1);
 	while (s[i] && s[i] != '=')
 	{
 		if (ft_isalpha(s[i]) == 0 && ft_isdigit(s[i]) == 0 && s[i] != '_')
-			return 1;
+			return (1);
 		i++;
 	}
 	i = 0;
@@ -70,25 +81,25 @@ int ft_check_validity(char *s)
 	return (0);
 }
 
-void ft_update_variable(t_env *node, char *new_value)
+void	ft_update_variable(t_env *node, char *new_value)
 {
 	free(node->value);
 	node->value = NULL;
 	node->value = new_value;
 }
 
-void update_or_create(t_env *list_pointer, char *string)
+void	update_or_create(t_env *list_pointer, char *string)
 {
-	t_env *search_node;
-	char *value;
-	char *var;
+	t_env	*search_node;
+	char	*value;
+	char	*var;
+
 	value = get_value(string);
 	var = get_name(string);
 	search_node = ft_get_env_node(list_pointer, var);
 	if (search_node == NULL)
 	{
 		search_node = ft_create_newnode(value, var);
-//		free(var);
 		ft_add_back(&list_pointer, search_node);
 	}
 	else
@@ -102,5 +113,4 @@ void update_or_create(t_env *list_pointer, char *string)
 			free(value);
 		free(var);
 	}
-//	free(value);
 }
