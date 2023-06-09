@@ -1,22 +1,34 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   link_list_utils_2.c                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: estruckm <estruckm@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/06/09 21:43:07 by estruckm          #+#    #+#             */
+/*   Updated: 2023/06/09 21:43:08 by estruckm         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/minishell.h"
 
 t_env	*ft_create_envnode(char *string)
 {
 	t_env	*node;
-	char *value;
-	char *var;
+	char	*value;
+	char	*var;
 
 	value = get_value(string);
-	var = 	get_name(string);
+	var = get_name(string);
 	node = (t_env *)ft_calloc(1, sizeof(t_env));
 	node->var = var;
 	node->value = value;
 	return (node);
 }
 
-t_env *ft_create_newnode(char *value, char *var)
+t_env	*ft_create_newnode(char *value, char *var)
 {
-	t_env *node;
+	t_env	*node;
 
 	node = (t_env *)ft_calloc(1, sizeof(t_env));
 	node->var = var;
@@ -61,10 +73,10 @@ t_mVars	*ft_create_ls_pointers(char **envp)
 	return (list_pointer);
 }
 
-void ft_create_cd_variables(t_mVars *list_pointer)
+void	ft_create_cd_variables(t_mVars *list_pointer)
 {
-	t_env *old_path;
-	t_env *pwd_path;
+	t_env	*old_path;
+	t_env	*pwd_path;
 
 	old_path = ft_get_env_node(list_pointer->ls_env, "OLDPWD");
 	pwd_path = ft_get_env_node(list_pointer->ls_env, "PWD");
@@ -79,5 +91,6 @@ void ft_create_cd_variables(t_mVars *list_pointer)
 	if (ft_get_env_node(list_pointer->ls_env, "HOME") == NULL)
 		list_pointer->home = NULL;
 	else
-		list_pointer->home = ft_strdup(ft_get_env_node(list_pointer->ls_env, "HOME")->value);
+		list_pointer->home = ft_strdup(ft_get_env_node(
+					list_pointer->ls_env, "HOME")->value);
 }
