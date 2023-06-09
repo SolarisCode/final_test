@@ -6,7 +6,7 @@
 /*   By: melkholy <melkholy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/22 02:05:42 by melkholy          #+#    #+#             */
-/*   Updated: 2023/05/22 02:07:50 by melkholy         ###   ########.fr       */
+/*   Updated: 2023/06/09 22:26:56 by melkholy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ typedef struct s_cmds
 	int				cmd_error;
 	int				file_error;
 	int				redirect;
+	int				path_exist;
 	struct s_cmds	*next;
 }				t_cmds;
 

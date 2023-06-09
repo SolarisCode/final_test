@@ -6,7 +6,7 @@
 /*   By: estruckm <estruckm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 23:06:58 by melkholy          #+#    #+#             */
-/*   Updated: 2023/05/24 00:11:10 by melkholy         ###   ########.fr       */
+/*   Updated: 2023/06/09 23:51:39 by melkholy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -222,7 +222,7 @@ void	ft_error_handler(t_cmds *cmd)
 		error_str = ft_strjoin("minihell: Permission denied : ", cmd->cmd);
 		g_term_attr.status = 126;
 	}
-	else if (cmd->cmd_error == 127)
+	else if (cmd->cmd_error == 127 && cmd->path_exist)
 	{
 		error_str = ft_strjoin("minihell: Command not found : ", cmd->cmd);
 		g_term_attr.status = 127;
@@ -240,6 +240,11 @@ void	ft_execute_cmd(t_cmds *cmd, char **env_array, t_env *env_list)
 {
 	ft_execute_in_redirect(cmd, env_list);
 	ft_execute_out_redirect(cmd);
+	if (!cmd->path_exist)
+	{
+		printf("minihell: No such file or directory : %s\n", cmd->cmd);
+		exit(1);
+	}
 	if (!cmd->full_cmd || cmd->file_error || cmd->cmd_error)
 		exit(1);
 	if (execve(cmd->full_cmd[0], cmd->full_cmd, env_array))
@@ -374,7 +379,8 @@ void	ft_child_cmd(t_mVars *vars_list, t_cmds *cmd, int index)
 		ft_close_out_pipes(vars_list, -1);
 	else
 		ft_close_out_pipes(vars_list, index);
-	if (!cmd->full_cmd || cmd->file_error || cmd->cmd_error)
+	if (!cmd->path_exist || (!cmd->full_cmd && !ft_is_builtin(cmd->cmd))
+		|| cmd->file_error || cmd->cmd_error)
 	{
 		ft_close_all_pipes(vars_list);
 		exit(1);
@@ -420,6 +426,8 @@ void	ft_cmds_processing(t_cmds *cmds, t_mVars *vars_list)
 	while (tmp)
 	{
 		ft_error_handler(tmp);
+		if (!tmp->path_exist)
+			printf("minihell: No such file or directory : %s\n", tmp->cmd);
 		if ((tmp->redirect & HEREDOC) == HEREDOC)
 		{
 			count ++;

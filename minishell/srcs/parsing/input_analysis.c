@@ -6,7 +6,7 @@
 /*   By: estruckm <estruckm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 00:02:20 by melkholy          #+#    #+#             */
-/*   Updated: 2023/05/23 22:20:44 by melkholy         ###   ########.fr       */
+/*   Updated: 2023/06/09 23:58:06 by melkholy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,33 +30,6 @@ char	*ft_realloc(char *str, int old_size, int new_size)
 	return (tmp);
 }
 
-// void	ft_arrange_args(t_cmds *cmd, int index, int len)
-// {
-// 	if (!cmd->args[index][len])
-// 	{
-// 		free(cmd->args[index]);
-// 		free(cmd->args[index + 1]);
-// 		while (cmd->args[index + 2])
-// 		{
-// 			cmd->args[index] = cmd->args[index + 2];
-// 			index ++;
-// 		}
-// 		cmd->args[index] = NULL;
-// 		return ;
-// 	}
-// 	free(cmd->args[index]);
-// 	cmd->args[index] = cmd->args[index + 1];
-// 	while (cmd->args[++index])
-// 		cmd->args[index] = cmd->args[index + 1];
-// }
-
-// char	**ft_cmd_table(char **cmd_table, char *str, int index)
-// {
-// 	cmd_table[index] = ft_strdup(str);
-// 	cmd_table = ft_double_realloc(cmd_table, index + 1, index + 2);
-// 	free(str);
-// 	return (cmd_table);
-// }
 char	*ft_find_envpath(t_env *env_list)
 {
 	t_env	*current;
@@ -232,22 +205,38 @@ void	ft_check_assigning(t_cmds *cmd, t_mVars *vars_list)
 	ft_free_dstr(tmp);
 }
 
-/* Used to check the input and pass it to the parsing and cutting
- functions to get back either a linked list with all the command original
- just one command in a node */
-void	ft_parse_input(char *in_put, t_mVars *vars_list)
+int	ft_mark_path(t_cmds *cmd, t_mVars *vars_list)
 {
-	t_cmds	*cmd;
+	char	*found_path;
 	t_cmds	*tmp;
-	int		count;
+	
+	found_path = ft_find_envpath(vars_list->ls_env);
+	if (found_path)
+		return (0);
+	tmp = cmd;
+	while (tmp)
+	{
+		if (!access(tmp->cmd, F_OK)
+			|| (ft_strcmp(tmp->cmd, "env") && ft_is_builtin(tmp->cmd)))
+		{
+			if (access(tmp->cmd, X_OK) && !ft_is_builtin(tmp->cmd))
+				tmp->cmd_error = 126;
+			if (!ft_is_builtin(tmp->cmd))
+				ft_create_fullcmd(tmp);
+			tmp->path_exist = 1;
+		}
+		else
+			tmp->cmd_error = 127;
+		tmp = tmp->next;
+	}
+	return (1);
+}
 
-	count = 0;
-	count += ft_isnspace_indx(in_put);
-	if (!in_put[count])
-		return ;
-	cmd = ft_text_analysis(&in_put[count], vars_list->ls_buffer);
-	free(in_put);
-	if (!cmd)
+void	ft_validate_path(t_cmds *cmd, t_mVars *vars_list)
+{
+	t_cmds	*tmp;
+
+	if (ft_mark_path(cmd, vars_list))
 		return ;
 	tmp = cmd;
 	while (tmp)
@@ -258,36 +247,38 @@ void	ft_parse_input(char *in_put, t_mVars *vars_list)
 		if (tmp->cmd && !ft_is_builtin(tmp->cmd))
 			if (!ft_add_path(tmp, vars_list->ls_buffer))
 				ft_create_fullcmd(tmp);
+		tmp->path_exist = 1;
 		tmp = tmp->next;
 	}
-	ft_cmd_analysis(cmd, vars_list);
-	/* The rest of the function is for demonstration purposes
-	  to make sure the lexer is working well*/
+}
+/* Used to check the input and pass it to the parsing and cutting
+ functions to get back either a linked list with all the command original
+ just one command in a node */
+void	ft_parse_input(char *in_put, t_mVars *vars_list)
+{
+	t_cmds	*cmd;
+	// t_cmds	*tmp;
+	int		count;
+
+	count = 0;
+	count += ft_isnspace_indx(in_put);
+	if (!in_put[count])
+		return ;
+	cmd = ft_text_analysis(&in_put[count], vars_list->ls_buffer);
+	free(in_put);
+	if (!cmd)
+		return ;
+	ft_validate_path(cmd, vars_list);
 	// tmp = cmd;
-	// int	cnt = -1;
-	//
 	// while (tmp)
 	// {
-	// 	count = 0;
-	// 	printf("Command: %s\n", tmp->cmd);
-	// 	while (tmp->args && tmp->args[count])
-	// 	{
-	// 		printf("Arg %d: %s\n", count, tmp->args[count]);
-	// 		count ++;
-	// 	}
-	// 	if ((tmp->redirect & INPUT))
-	// 		while (cmd->from_file[++cnt])
-	// 			printf("From_file: %s\n", tmp->from_file[cnt]);
-	// 	cnt = -1;
-	// 	if ((tmp->redirect & HEREDOC))
-	// 		while (cmd->hdocs_end[++cnt])
-	// 			printf("Heredoc_end: %s\n", tmp->hdocs_end[cnt]);
-	// 	cnt = -1;
-	// 	if ((tmp->redirect & OUTPUT) || (tmp->redirect & APPEND))
-	// 		while (cmd->to_file[++cnt])
-	// 			printf("To_file: %s\n", tmp->to_file[cnt]);
+	// 	if (tmp->cmd && (ft_check_validity(tmp->cmd) == 2
+	// 			|| ft_check_validity(tmp->cmd) == 3))
+	// 		ft_check_assigning(tmp, vars_list);
+	// 	if (tmp->cmd && !ft_is_builtin(tmp->cmd))
+	// 		if (!ft_add_path(tmp, vars_list->ls_buffer))
+	// 			ft_create_fullcmd(tmp);
 	// 	tmp = tmp->next;
 	// }
-	// ft_cmd_analysis(cmd, vars_list);
-	// ft_execute_buildin(cmd, env_list); //placing this here causes no problems
+	ft_cmd_analysis(cmd, vars_list);
 }
