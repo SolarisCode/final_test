@@ -6,7 +6,7 @@
 /*   By: estruckm <estruckm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 18:24:17 by estruckm          #+#    #+#             */
-/*   Updated: 2023/06/09 23:55:59 by melkholy         ###   ########.fr       */
+/*   Updated: 2023/06/10 00:23:25 by estruckm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 void	ft_execute_buildins(t_cmds *cmd, t_mVars *list_pointer)
 {
+	if (cmd->redirect == 2)
+		close(ft_here_doc(cmd->hdocs_end, list_pointer->ls_env));
 	if (!cmd->path_exist)
 	{
 		printf("minihell: No such file or directory : %s\n", cmd->cmd);
