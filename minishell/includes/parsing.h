@@ -6,7 +6,7 @@
 /*   By: melkholy <melkholy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/22 02:05:03 by melkholy          #+#    #+#             */
-/*   Updated: 2023/05/22 02:05:17 by melkholy         ###   ########.fr       */
+/*   Updated: 2023/06/10 19:24:09 by melkholy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,16 @@
 
 # include "minishell.h"
 
-/* parsing_redirection.c */
+/* many_redirection.c */
+char	**ft_many_redirect(char **old_files, char *new_file, int len);
 char	*ft_add_io_file(char *old_file, char *new_file, int len);
-void	ft_arrange_table(char **table, int index, int len);
+
+/* parsing_redirection.c */
 int		ft_add_redirection(char **table, t_cmds *cmd, int index, int len);
-int		ft_get_redirection(char *in_put);
+void	ft_arrange_table(char **table, int index, int len);
 int		ft_check_redirect(t_cmds *cmd, char **cmd_table);
+void	ft_apply_priority(t_cmds *cmd, int redirect);
+int		ft_get_redirection(char *in_put);
 
 /* parser.c */
 t_cmds	*ft_parser(char **cmd_table);

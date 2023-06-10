@@ -6,7 +6,7 @@
 #    By: estruckm <estruckm@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/12 00:02:38 by melkholy          #+#    #+#              #
-#    Updated: 2023/05/22 02:30:57 by melkholy         ###   ########.fr        #
+#    Updated: 2023/06/10 19:30:09 by melkholy         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,12 +20,21 @@ RESET	= \033[0m
 
 SOURCES = srcs/main.c \
 			srcs/parsing/parsing_utils.c \
+			srcs/parsing/assigning_vars.c \
+			srcs/parsing/command_path.c \
+			srcs/parsing/many_redirection.c \
 			srcs/parsing/parsing_redirection.c \
 			srcs/lexing/lexer.c \
 			srcs/parsing/parser.c \
 			srcs/parsing/input_analysis.c \
 			srcs/signals/signals.c \
-			srcs/execution/execution.c \
+			srcs/execution/cmds_processing.c \
+			srcs/execution/error_handling.c \
+			srcs/execution/execute_redirection.c \
+			srcs/execution/execute_utils.c \
+			srcs/execution/execution_analysis.c \
+			srcs/execution/heredocs.c \
+			srcs/execution/piping.c \
 			srcs/link_list_utils/link_list_utils_1.c \
 			srcs/link_list_utils/link_list_utils_2.c \
 			srcs/link_list_utils/link_list_utils_3.c \
@@ -58,10 +67,10 @@ $(NAME): $(LIBFT) $(OBJS)
 	printf "$(SUCCESS_CLR) Done.$(RESET_CLR)\n" || \
 	printf "$(COLOR_RED) Failed.$(RESET_CLR)\n"
 
-%.o: %.c
-	@printf "$(COLOR_BLUE)Compiling $<...$(RESET_CLR)"; \
-	$(CC) $(CFLAGS) -c $< -o $@; \
-	printf "$(SUCCESS_CLR) Done.$(RESET_CLR)\n"
+# %.o: %.c
+# 	@printf "$(COLOR_BLUE)Compiling $<...$(RESET_CLR)"; \
+# 	$(CC) $(CFLAGS) -c $< -o $@; \
+# 	printf "$(SUCCESS_CLR) Done.$(RESET_CLR)\n"
 
 linux: $(LIBFT) $(SOURCES)
 	@printf "$(COLOR_BLUE)Compiling $<...$(RESET_CLR)"; \

@@ -6,10 +6,9 @@
 /*   By: estruckm <estruckm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 21:13:29 by estruckm          #+#    #+#             */
-/*   Updated: 2023/06/09 21:13:30 by estruckm         ###   ########.fr       */
+/*   Updated: 2023/06/10 19:12:59 by melkholy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #include "../../includes/minishell.h"
 

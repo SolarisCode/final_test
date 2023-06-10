@@ -6,7 +6,7 @@
 /*   By: estruckm <estruckm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 21:42:46 by estruckm          #+#    #+#             */
-/*   Updated: 2023/06/09 21:42:47 by estruckm         ###   ########.fr       */
+/*   Updated: 2023/06/10 18:55:56 by melkholy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,11 +29,11 @@ void	ft_sort_linked_list(t_env **head_ref)
 {
 	int		swapped;
 	t_env	*current;
-	t_env	*next;
+	// t_env	*next;
 
 	if (*head_ref == NULL || (*head_ref)->next == NULL)
 		return ;
-	next = NULL;
+	// next = NULL;
 	while (1)
 	{
 		swapped = 0;
@@ -47,7 +47,7 @@ void	ft_sort_linked_list(t_env **head_ref)
 			}
 			current = current->next;
 		}
-		next = current;
+		// next = current;
 		if (!swapped)
 			break ;
 	}
